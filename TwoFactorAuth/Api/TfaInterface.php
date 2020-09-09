@@ -15,6 +15,11 @@ interface TfaInterface
     /**
      * Forced providers fields
      */
+    public const XML_PATH_TFA_STATUS = 'twofactorauth/general/active';
+
+    /**
+     * Forced providers fields
+     */
     public const XML_PATH_FORCED_PROVIDERS = 'twofactorauth/general/force_providers';
 
     /**
