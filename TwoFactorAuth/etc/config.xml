@@ -10,6 +10,7 @@
     <default>
         <twofactorauth>
             <general>
+                <active>1</active>
                 <force_providers></force_providers>
             </general>
             <authy>

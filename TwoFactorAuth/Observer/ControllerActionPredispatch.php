@@ -11,6 +11,7 @@ use Magento\Authorization\Model\UserContextInterface;
 use Magento\Backend\App\AbstractAction;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\ActionFlag;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\AuthorizationInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -75,6 +76,11 @@ class ControllerActionPredispatch implements ObserverInterface
     private $userContext;
 
     /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
      * @param TfaInterface $tfa
      * @param TfaSessionInterface $tfaSession
      * @param UserConfigRequestManagerInterface $configRequestManager
@@ -83,6 +89,7 @@ class ControllerActionPredispatch implements ObserverInterface
      * @param UrlInterface $url
      * @param AuthorizationInterface $authorization
      * @param UserContextInterface $userContext
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         TfaInterface $tfa,
@@ -92,7 +99,8 @@ class ControllerActionPredispatch implements ObserverInterface
         ActionFlag $actionFlag,
         UrlInterface $url,
         AuthorizationInterface $authorization,
-        UserContextInterface $userContext
+        UserContextInterface $userContext,
+        ScopeConfigInterface $scopeConfig
     ) {
         $this->tfa = $tfa;
         $this->tfaSession = $tfaSession;
@@ -102,6 +110,7 @@ class ControllerActionPredispatch implements ObserverInterface
         $this->url = $url;
         $this->authorization = $authorization;
         $this->userContext = $userContext;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -121,6 +130,10 @@ class ControllerActionPredispatch implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
+        $isActive = (bool) $this->scopeConfig->getValue(TfaInterface::XML_PATH_TFA_STATUS);
+        if (!$isActive) {
+            return;
+        }
         /** @var $controllerAction AbstractAction */
         $controllerAction = $observer->getEvent()->getData('controller_action');
         $this->action = $controllerAction;
